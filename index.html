@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1DSDMD83ER"></script>
+  <script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-1DSDMD83ER');
+  </script>
+  <meta charset="utf-8" />
+  <title>NYC Traffic Cam Explorer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="favicon.png" />
+  <!-- Leaflet & MarkerCluster -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1><a href="/cam/index.html"><img src="favicon.png" alt="logo"/><!--img src="logo-mid.png" alt="logo" /-->NYC Traffic Cam Explorer</a></h1>
+    <input type="search" id="search" placeholder="Search…"/>
+    <button id="toggleView">Map ▸ Grid</button>
+    <button id="fsBtn" class="hidden">Full Screen</button>
+  </header>
+  <main>
+    <div id="map"></div>
+    <div id="panel"></div>
+    <div id="grid" class="hidden"></div>
+  </main>
+
+  <template id="tplCard">
+    <figure class="cam"><img loading="lazy"/><figcaption></figcaption></figure>
+  </template>
+
+  <!-- modal -->
+  <div id="modal">
+    <div id="modalContent">
+      <button id="modalClose">&times;</button>
+      <img id="modalImage"/>
+      <div id="meta">
+        <div><span class="label">Camera</span><span id="mName"></span></div>
+        <div><span class="label">Last Refresh</span><span id="mTime"></span></div>
+        <div><span class="label">Coords</span><span id="mLatLon"></span></div>
+        <div><span class="label">Map</span><div id="metaMap"></div></div>
+        <div class="nearbyBtns">
+          <button class="nearbyBtn" data-yard="100">Cams within 100 yd</button><br />
+          <button class="nearbyBtn" data-yard="400">Cams within 400 yd</button><br />
+          <button class="nearbyBtn" data-yard="1000">Cams within 1000 yd</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
