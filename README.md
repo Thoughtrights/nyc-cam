@@ -9,6 +9,11 @@ cam. It just feels better than a hunt-and-peck style.
 
 ## To Do
 
-Fix the leafletJS bug when resizing the window. It freaks the map
-out. I tried to stamp it out in a few ways but no luck so far. I had
-suspected something odd with the lat/lon vs lon/lat but don't see it.
++ Fix the leafletJS bug when resizing the window. It freaks the map
+  out. I tried to stamp it out in a few ways but no luck so far. I had
+  suspected something odd with the lat/lon vs lon/lat but don't see
+  it.
+
++ Make all grid, fullscreen, and map buttons top level. Introduce a
+  global status. Adjust the status based on the user actions, but also
+  the corner cases where it can be shifted for the user.

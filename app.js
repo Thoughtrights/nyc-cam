@@ -1,9 +1,10 @@
 /* Note: I have a yet unfound bug with leaflet. lat/lon get mangled in some way. */
 
 window.addEventListener('resize', function(event) {
-  // Code to execute when the window is resized
-  switchToMap();
-  console.log('resized!');
+  // Code to execute when the window is resized when it is in map mode already
+  if(GRID.classList.contains('hidden')) {
+    switchToMap();
+  }
 });
 
 var $ = function(sel){ return document.querySelector(sel); };
