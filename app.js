@@ -37,7 +37,8 @@ function saveState(){
     // only save ids when it's a real subset (not all cams)
     gridIds: (gridList && gridList !== cams) ? gridList.map(function(c){ return c.id||c.imageUrl; }) : null
   };
-  if(map){ var ctr=map.getCenter(); state.lat=ctr.lat; state.lng=ctr.lng; state.zoom=map.getZoom(); }
+  // Only read map position when the map div is visible — Leaflet returns garbage coords when hidden
+  if(map && !MAP_DIV.classList.contains('hidden')){ var ctr=map.getCenter(); state.lat=ctr.lat; state.lng=ctr.lng; state.zoom=map.getZoom(); }
   try{ localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch(e){}
 }
 
@@ -45,7 +46,11 @@ function restoreState(){
   var state;
   try{ state=JSON.parse(localStorage.getItem(STATE_KEY)||'null'); } catch(e){}
   if(!state) return;
-  if(state.lat && map) map.setView([state.lat, state.lng], state.zoom, {animate:false});
+  // Sanity-check coords are somewhere near NYC before restoring
+  var nycBounds={latMin:40.4,latMax:41.1,lngMin:-74.4,lngMax:-73.6};
+  if(state.lat && map && state.lat>nycBounds.latMin && state.lat<nycBounds.latMax && state.lng>nycBounds.lngMin && state.lng<nycBounds.lngMax){
+    map.setView([state.lat, state.lng], state.zoom, {animate:false});
+  }
   if(state.view==='grid'){
     var list=cams;
     if(state.gridIds && state.gridIds.length>0){
