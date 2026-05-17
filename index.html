@@ -34,7 +34,12 @@
     <div id="map"></div>
     <div id="panel"></div>
     <div id="grid" class="hidden"></div>
-  </main>
+    <div id="sharedBanner" class="hidden">
+    <span id="sharedBannerMsg"></span>
+    <button id="sharedBannerSave">Save to Dashboards</button>
+    <button id="sharedBannerDismiss">&times;</button>
+  </div>
+</main>
 
   <template id="tplCard">
     <figure class="cam"><img loading="lazy"/><figcaption></figcaption></figure>
@@ -70,6 +75,7 @@
       <div id="dashSaveRow" class="hidden">
         <input id="dashNameInput" type="text" placeholder="Name this view…" />
         <button id="dashSaveConfirm">Save View</button>
+        <button id="dashShareCurrent">Copy Link</button>
       </div>
       <div id="dashItems"></div>
       <p id="dashEmpty" class="hidden">No saved dashboards yet.</p>

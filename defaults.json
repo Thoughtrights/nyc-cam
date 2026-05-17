@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Manhattan",
+    "description": "Traffic cameras spread across Manhattan",
+    "area": "Manhattan",
+    "limit": 16
+  },
+  {
+    "name": "Brooklyn",
+    "description": "Traffic cameras spread across Brooklyn",
+    "area": "Brooklyn",
+    "limit": 16
+  },
+  {
+    "name": "Queens",
+    "description": "Traffic cameras spread across Queens",
+    "area": "Queens",
+    "limit": 16
+  },
+  {
+    "name": "The Bronx",
+    "description": "Traffic cameras spread across the Bronx",
+    "area": "Bronx",
+    "limit": 12
+  },
+  {
+    "name": "Staten Island",
+    "description": "Traffic cameras spread across Staten Island",
+    "area": "Staten Island",
+    "limit": 12
+  }
+]

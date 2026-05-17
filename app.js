@@ -27,7 +27,7 @@ var M_IMG=$('#modalImage'), M_NAME=$('#mName'), M_TIME=$('#mTime'), M_LATLON=$('
 var cams=[], map, cluster, currentSubset=[], gridTimer, modalTimer, currentCam=null, mini;
 var gridList=null; // null = all cams; array = current subset shown in grid
 
-var STATE_KEY='nycCamState', DASH_KEY='nycCamDashboards';
+var STATE_KEY='nycCamState', DASH_KEY='nycCamDashboards', SEEDED_KEY='nycCamSeeded';
 
 /* ---- Persistence ---- */
 function saveState(){
@@ -70,7 +70,7 @@ function renderDashPanel(){
   var ITEMS=document.getElementById('dashItems');
   var EMPTY=document.getElementById('dashEmpty');
   var SAVE_ROW=document.getElementById('dashSaveRow');
-  // save button only makes sense when grid is visible
+  // save/share buttons only make sense when grid is visible
   SAVE_ROW.classList.toggle('hidden', GRID.classList.contains('hidden'));
   var dashes=getDashes();
   EMPTY.classList.toggle('hidden', dashes.length>0);
@@ -89,6 +89,14 @@ function renderDashPanel(){
       closeDashPanel();
       switchToGrid(list);
     };
+    var shareBtn=document.createElement('button');
+    shareBtn.className='dash-share';
+    shareBtn.textContent='🔗';
+    shareBtn.title='Copy share link';
+    shareBtn.onclick=function(){
+      var list=d.ids.map(function(id){ return findCam(id); }).filter(Boolean);
+      copyShareUrl(list, shareBtn);
+    };
     var delBtn=document.createElement('button');
     delBtn.textContent='✕';
     delBtn.className='dash-del';
@@ -98,6 +106,7 @@ function renderDashPanel(){
     };
     row.appendChild(nameEl);
     row.appendChild(loadBtn);
+    row.appendChild(shareBtn);
     row.appendChild(delBtn);
     ITEMS.appendChild(row);
   });
@@ -106,6 +115,83 @@ function renderDashPanel(){
 function openDashPanel(){ renderDashPanel(); $('#dashPanel').classList.remove('hidden'); $('#dashOverlay').classList.remove('hidden'); }
 function closeDashPanel(){ $('#dashPanel').classList.add('hidden'); $('#dashOverlay').classList.add('hidden'); }
 
+/* ---- Default dashboards (seeded once per visitor) ---- */
+function seedDefaults(){
+  if(localStorage.getItem(SEEDED_KEY)) return;
+  fetch('defaults.json').then(function(r){ return r.json(); }).then(function(defs){
+    var arr=getDashes();
+    // Add in reverse so first entry ends up at top
+    defs.slice().reverse().forEach(function(def){
+      var pool=def.area ? cams.filter(function(c){ return c.area===def.area; }) : cams;
+      var lim=def.limit||12;
+      // Spread evenly across the pool rather than taking the first N
+      var step=Math.max(1, Math.floor(pool.length/lim));
+      var ids=[];
+      for(var i=0; i<pool.length && ids.length<lim; i+=step){
+        ids.push(pool[i].id||pool[i].imageUrl);
+      }
+      if(ids.length) arr.unshift({name:def.name, ids:ids, created:Date.now()});
+    });
+    putDashes(arr);
+    localStorage.setItem(SEEDED_KEY, '1');
+  }).catch(function(){
+    // defaults.json missing — just mark as seeded so we don't retry every load
+    localStorage.setItem(SEEDED_KEY, '1');
+  });
+}
+
+/* ---- Sharing ---- */
+function makeShareUrl(list){
+  // Strip dashes from UUIDs to keep the URL shorter (32 vs 36 chars each)
+  var ids=list.map(function(c){ return (c.id||c.imageUrl).replace(/-/g,''); }).join(',');
+  return location.href.split('#')[0]+'#s='+ids;
+}
+
+function copyShareUrl(list, btn){
+  var url=makeShareUrl(list);
+  var orig=btn.textContent;
+  navigator.clipboard.writeText(url).then(function(){
+    btn.textContent='Copied!';
+    setTimeout(function(){ btn.textContent=orig; }, 2000);
+  }).catch(function(){
+    // Clipboard API blocked (e.g. non-HTTPS) — fall back to prompt
+    prompt('Copy this link:', url);
+  });
+}
+
+function checkShareHash(){
+  if(!location.hash.startsWith('#s=')) return false;
+  var raw=location.hash.slice(3);
+  if(!raw) return false;
+  var ids=raw.split(',').map(function(h){
+    // Reconstruct UUID from 32-char no-dash form: 8-4-4-4-12
+    if(h.length===32) return h.slice(0,8)+'-'+h.slice(8,12)+'-'+h.slice(12,16)+'-'+h.slice(16,20)+'-'+h.slice(20);
+    return h;
+  });
+  var list=ids.map(function(id){ return findCam(id); }).filter(Boolean);
+  if(!list.length) return false;
+  switchToGrid(list);
+  showSharedBanner(list);
+  return true;
+}
+
+function showSharedBanner(list){
+  var banner=$('#sharedBanner');
+  $('#sharedBannerMsg').textContent='Shared dashboard — '+list.length+' cams';
+  banner.classList.remove('hidden');
+  $('#sharedBannerSave').onclick=function(){
+    var name=prompt('Save as:','Shared Dashboard');
+    if(!name) return;
+    var ids=list.map(function(c){ return c.id||c.imageUrl; });
+    var arr=getDashes();
+    arr.unshift({name:name, ids:ids, created:Date.now()});
+    putDashes(arr);
+    banner.classList.add('hidden');
+    history.replaceState(null,'',location.pathname); // clean the hash from the URL
+  };
+  $('#sharedBannerDismiss').onclick=function(){ banner.classList.add('hidden'); };
+}
+
 // Init
 fetch('config.json').then(function(r){ return r.json(); }).then(function(data){
   cams=data;
@@ -113,7 +199,9 @@ fetch('config.json').then(function(r){ return r.json(); }).then(function(data){
   initMap();
   attachNearby();
   initDashUI();
-  restoreState();
+  seedDefaults();
+  // Shared link takes priority over restored session state
+  if(!checkShareHash()) restoreState();
 });
 
 function initDashUI(){
@@ -129,6 +217,10 @@ function initDashUI(){
     putDashes(arr);
     inp.value='';
     renderDashPanel();
+  };
+  $('#dashShareCurrent').onclick=function(){
+    var list=gridList||cams;
+    copyShareUrl(list, $('#dashShareCurrent'));
   };
 }
 
