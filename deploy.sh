@@ -11,6 +11,7 @@ FILES=(
   app.js
   style.css
   config.json
+  defaults.json
   favicon.png
   logo-mid.png
 )
