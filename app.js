@@ -171,6 +171,8 @@ function checkShareHash(){
   var list=ids.map(function(id){ return findCam(id); }).filter(Boolean);
   if(!list.length) return false;
   switchToGrid(list);
+  document.body.classList.add('fs');
+  FSBTN.textContent='Exit Full Screen';
   showSharedBanner(list);
   return true;
 }
