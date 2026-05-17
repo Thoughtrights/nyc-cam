@@ -249,7 +249,7 @@ function attachNearby(){
     btn.onclick=function(){
       if(!currentCam) return;
       var yard=parseInt(btn.dataset.yard,10);
-      var near=cams.filter(function(c){ return c!==currentCam && c.latitude && hav(currentCam,c)<=yard*Y2M; });
+      var near=cams.filter(function(c){ return c.latitude && (c===currentCam || hav(currentCam,c)<=yard*Y2M); });
       closeModal();
       switchToGrid(near);
     };
