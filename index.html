@@ -28,6 +28,7 @@
     <input type="search" id="search" placeholder="Search…"/>
     <button id="toggleView">Map ▸ Grid</button>
     <button id="fsBtn" class="hidden">Full Screen</button>
+    <button id="dashBtn">Dashboards</button>
   </header>
   <main>
     <div id="map"></div>
@@ -55,6 +56,23 @@
           <button class="nearbyBtn" data-yard="1000">Cams within 1000 yd</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Dashboard panel -->
+  <div id="dashOverlay" class="hidden"></div>
+  <div id="dashPanel" class="hidden">
+    <div id="dashPanelInner">
+      <div class="dash-header">
+        <strong>Dashboards</strong>
+        <button id="dashClose">&times;</button>
+      </div>
+      <div id="dashSaveRow" class="hidden">
+        <input id="dashNameInput" type="text" placeholder="Name this view…" />
+        <button id="dashSaveConfirm">Save View</button>
+      </div>
+      <div id="dashItems"></div>
+      <p id="dashEmpty" class="hidden">No saved dashboards yet.</p>
     </div>
   </div>
 </body>
